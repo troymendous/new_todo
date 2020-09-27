@@ -6,13 +6,11 @@
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-import Todolist from "./components/TodoList";
+import TodoList from "./components/TodoList.vue";
 
 export default {
   name: "App",
   components: {
-    HelloWorld,
     TodoList,
   },
 };
@@ -24,7 +22,7 @@ export default {
 }
 
 .container {
-  max-width: 600;
+  max-width: 600px;
   margin: 0 auto;
 }
 
