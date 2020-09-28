@@ -11,7 +11,7 @@
         <input type="checkbox" v-model="todo.completed" />
         <div
           v-if="!todo.editing"
-          @bdlclick="editTodo(todo)"
+          @dblclick="editTodo(todo)"
           class="todo-item-label"
         >
           <!-- This is meant to go inside the above div but can't seem to debug it  :class="(completed, todo.completed)" -->
