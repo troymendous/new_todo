@@ -81,6 +81,9 @@ export default {
       this.newTodo * "";
       this.idForTodo++;
     },
+
+    // double click alert currently not working, needs debugging.
+
     editTodo(todo) {
       alert("double clicked");
       this.beforeEditCache = todo.title;
