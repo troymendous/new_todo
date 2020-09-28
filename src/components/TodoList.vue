@@ -8,14 +8,26 @@
     />
     <div v-for="(todo, index) in todos" :key="todo.id" class="todo-item">
       <div class="todo-item-left">
+        <input type="checkbox" v-model="todo.completed" />
         <div
           v-if="!todo.editing"
           @bdlclick="editTodo(todo)"
           class="todo-item-label"
         >
+          <!-- This is meant to go inside the above div but can't seem to debug it  :class="(completed, todo.completed)" -->
+
           {{ todo.title }}
         </div>
-        <input v-else class="todo-item-edit" type="text" v-model="todo.title" />
+        <input
+          v-else
+          class="todo-item-edit"
+          type="text"
+          v-model="todo.title"
+          @blur="doneEdit(todo)"
+          @keyup.enter="doneEdit(todo)"
+          @keyup.esc="cancelEdit(todo)"
+          v-focus
+        />
       </div>
       <div class="remove-item" @click="removeTodo(index)">&times;</div>
     </div>
@@ -29,6 +41,7 @@ export default {
     return {
       newTodo: "",
       idForTodo: 3,
+      beforeEditCache: "",
       todos: [
         {
           id: 1,
@@ -45,6 +58,15 @@ export default {
       ],
     };
   },
+
+  directives: {
+    focus: {
+      inserted: function (el) {
+        el.focus();
+      },
+    },
+  },
+
   methods: {
     addTodo() {
       if (this.newTodo.trim().length == 0) {
@@ -61,7 +83,19 @@ export default {
     },
     editTodo(todo) {
       alert("double clicked");
+      this.beforeEditCache = todo.title;
       todo.editing = true;
+    },
+    doneEdit(todo) {
+      todo.editing = false;
+      if (todo.title.trim() == "") {
+        todo.title = this.beforeEditCache;
+      }
+    },
+
+    cancelEdit(todo) {
+      todo.title = this.beforeEditCache;
+      todo.editing = false;
     },
     removeTodo(index) {
       this.todos.splice(index, 1);
@@ -122,5 +156,10 @@ export default {
   &:focus {
     outline: none;
   }
+}
+
+.completed {
+  text-decoration: line-through;
+  color: gray;
 }
 </style>
