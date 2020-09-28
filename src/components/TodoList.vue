@@ -13,9 +13,8 @@
           v-if="!todo.editing"
           @dblclick="editTodo(todo)"
           class="todo-item-label"
+          v-bind:class="{ completed: todo.completed }"
         >
-          <!-- This is meant to go inside the above div but can't seem to debug it  :class="(completed, todo.completed)" -->
-
           {{ todo.title }}
         </div>
         <input
@@ -160,6 +159,6 @@ export default {
 
 .completed {
   text-decoration: line-through;
-  color: gray;
+  color: grey;
 }
 </style>
