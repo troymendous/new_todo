@@ -1,34 +1,46 @@
 <template>
-  <div>
-    <input
-      class="todo-input"
-      placeholder="What needs to be done?"
-      v-model="newTodo"
-      @keyup.enter="addTodo"
-    />
-    <div v-for="(todo, index) in todos" :key="todo.id" class="todo-item">
-      <div class="todo-item-left">
-        <input type="checkbox" v-model="todo.completed" />
-        <div
-          v-if="!todo.editing"
-          @dblclick="editTodo(todo)"
-          class="todo-item-label"
-          v-bind:class="{ completed: todo.completed }"
-        >
-          {{ todo.title }}
+  <div class="parent">
+    <div>
+      <input
+        class="todo-input"
+        placeholder="What needs to be done?"
+        v-model="newTodo"
+        @keyup.enter="addTodo"
+      />
+      <div v-for="(todo, index) in todos" :key="todo.id" class="todo-item">
+        <div class="todo-item-left">
+          <input type="checkbox" v-model="todo.completed" />
+          <div
+            v-if="!todo.editing"
+            @dblclick="editTodo(todo)"
+            class="todo-item-label"
+            v-bind:class="{ completed: todo.completed }"
+          >
+            {{ todo.title }}
+          </div>
+          <input
+            v-else
+            class="todo-item-edit"
+            type="text"
+            v-model="todo.title"
+            @blur="doneEdit(todo)"
+            @keyup.enter="doneEdit(todo)"
+            @keyup.esc="cancelEdit(todo)"
+            v-focus
+          />
         </div>
-        <input
-          v-else
-          class="todo-item-edit"
-          type="text"
-          v-model="todo.title"
-          @blur="doneEdit(todo)"
-          @keyup.enter="doneEdit(todo)"
-          @keyup.esc="cancelEdit(todo)"
-          v-focus
-        />
+        <div class="remove-item" @click="removeTodo(index)">&times;</div>
       </div>
-      <div class="remove-item" @click="removeTodo(index)">&times;</div>
+    </div>
+
+    <div class="extra-container">
+      <div>
+        <label>
+          <input type="checkbox" :checked:="!anyRemaining" />
+          <p>Check All</p>
+        </label>
+      </div>
+      <div>{{ remaining }} items left</div>
     </div>
   </div>
 </template>
@@ -56,6 +68,15 @@ export default {
         },
       ],
     };
+  },
+
+  computed: {
+    remaining() {
+      return this.todos.filter((todo) => !todo.completed).length;
+    },
+    anyRemaining() {
+      return (this.remaining = !0);
+    },
   },
 
   directives: {
@@ -108,7 +129,7 @@ export default {
 .todo-input {
   width: 100%;
   padding: 10px 10px;
-  font-size: 10px;
+  font-size: 1.5rem;
   margin-bottom: 16px;
 
   &:focus {
@@ -137,7 +158,7 @@ export default {
 }
 
 .todo-item-label {
-  padding: 1-px;
+  padding: 1px;
   border: 1px solid white;
   margin-left: 12px;
 }
@@ -160,5 +181,33 @@ export default {
 .completed {
   text-decoration: line-through;
   color: grey;
+}
+
+.extra-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+  border-top: 1px solid lightgray;
+  padding-top: 14px;
+  margin-bottom: 14px;
+}
+
+button {
+  font-size: 14px;
+  background-color: white;
+  appearance: none;
+
+  &:hover {
+    background: lightgreen;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.active {
+  background: lightgreen;
 }
 </style>
