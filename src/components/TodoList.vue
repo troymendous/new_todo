@@ -2,35 +2,46 @@
   <div class="parent">
     <div>
       <input
+        type="text"
         class="todo-input"
         placeholder="What needs to be done?"
         v-model="newTodo"
         @keyup.enter="addTodo"
       />
-      <div v-for="(todo, index) in todos" :key="todo.id" class="todo-item">
-        <div class="todo-item-left">
-          <input type="checkbox" v-model="todo.completed" />
-          <div
-            v-if="!todo.editing"
-            @dblclick="editTodo(todo)"
-            class="todo-item-label"
-            v-bind:class="{ completed: todo.completed }"
-          >
-            {{ todo.title }}
+      <transition-group
+        name="fade"
+        enter-active-class="animated fadeInUp"
+        leave-active-class="animated fadeOutDown"
+      >
+        <div
+          v-for="(todo, index) in todosFiltered"
+          :key="todo.id"
+          class="todo-item"
+        >
+          <div class="todo-item-left">
+            <input type="checkbox" v-model="todo.completed" />
+            <div
+              v-if="!todo.editing"
+              @dblclick="editTodo(todo)"
+              class="todo-item-label"
+              v-bind:class="{ completed: todo.completed }"
+            >
+              {{ todo.title }}
+            </div>
+            <input
+              v-else
+              class="todo-item-edit"
+              type="text"
+              v-model="todo.title"
+              @blur="doneEdit(todo)"
+              @keyup.enter="doneEdit(todo)"
+              @keyup.esc="cancelEdit(todo)"
+              v-focus
+            />
           </div>
-          <input
-            v-else
-            class="todo-item-edit"
-            type="text"
-            v-model="todo.title"
-            @blur="doneEdit(todo)"
-            @keyup.enter="doneEdit(todo)"
-            @keyup.esc="cancelEdit(todo)"
-            v-focus
-          />
+          <div class="remove-item" @click="removeTodo(index)">&times;</div>
         </div>
-        <div class="remove-item" @click="removeTodo(index)">&times;</div>
-      </div>
+      </transition-group>
     </div>
 
     <div>
@@ -47,6 +58,34 @@
         </label>
       </div>
     </div>
+
+    <div class="extra-container">
+      <div>
+        <button :class="{ active: filter == 'all' }" @click="filter = 'all'">
+          All
+        </button>
+        <button
+          :class="{ active: filter == 'active' }"
+          @click="filter = 'active'"
+        >
+          Active
+        </button>
+        <button
+          :class="{ active: filter == 'completed' }"
+          @click="filter = 'completed'"
+        >
+          completed
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <transition name="fade">
+        <button v-if="showClearedCompletedButton" @click="clearCompleted">
+          Clear Completed
+        </button>
+      </transition>
+    </div>
   </div>
 </template>
 
@@ -58,6 +97,7 @@ export default {
       newTodo: "",
       idForTodo: 3,
       beforeEditCache: "",
+      filter: "all",
       todos: [
         {
           id: 1,
@@ -81,6 +121,19 @@ export default {
     },
     anyRemaining() {
       return this.remaining != 0;
+    },
+    todosFiltered() {
+      if (this.filter == "all") {
+        return this.todos;
+      } else if (this.filter == " active") {
+        return this.todos.filter((todo) => !todo.completed);
+      } else if (this.filter == " completed") {
+        return this.todos.filter((todo) => todo.completed);
+      }
+      return this.todos;
+    },
+    showClearedCompletedButton() {
+      return this.todos.filter((todo) => todo.completed).length > 0;
     },
   },
 
@@ -128,12 +181,17 @@ export default {
     checkAllTodos() {
       this.todos.forEach((todo) => (todo.completed = event.target.checked));
     },
+    clearCompleted() {
+      this.todos = this.todos.filter((todo) => !todo.completed);
+    },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css");
+
 .todo-input {
   width: 100%;
   padding: 10px 10px;
@@ -224,5 +282,16 @@ button {
 
 .active {
   background: lightgreen;
+}
+
+// CSS Transitions
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
