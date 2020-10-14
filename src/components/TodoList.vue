@@ -33,14 +33,19 @@
       </div>
     </div>
 
-    <div class="extra-container">
+    <div>
       <div>
-        <label>
-          <input type="checkbox" :checked:="!anyRemaining" />
+        <label class="extra-container">
+          <input
+            type="checkbox"
+            :checked="!anyRemaining"
+            @change="checkAllTodos"
+          />
           <p>Check All</p>
+
+          <div class="remaining">{{ remaining }} items left</div>
         </label>
       </div>
-      <div>{{ remaining }} items left</div>
     </div>
   </div>
 </template>
@@ -75,7 +80,7 @@ export default {
       return this.todos.filter((todo) => !todo.completed).length;
     },
     anyRemaining() {
-      return (this.remaining = !0);
+      return this.remaining != 0;
     },
   },
 
@@ -119,6 +124,9 @@ export default {
     },
     removeTodo(index) {
       this.todos.splice(index, 1);
+    },
+    checkAllTodos() {
+      this.todos.forEach((todo) => (todo.completed = event.target.checked));
     },
   },
 };
@@ -186,11 +194,18 @@ export default {
 .extra-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   font-size: 16px;
   border-top: 1px solid lightgray;
   padding-top: 14px;
   margin-bottom: 14px;
+  & > p {
+    margin-left: 1rem;
+  }
+  .remaining {
+    align-self: right;
+    margin-left: 30rem;
+  }
 }
 
 button {
